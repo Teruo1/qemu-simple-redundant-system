@@ -1,5 +1,3 @@
-// sistema_redundante.c
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -7,25 +5,19 @@
 #define NUM_CONTEXTS 3
 #define MAX_STEPS 100000
 
-// Simulação dos três sensores
 long sensor(int id)
 {
-    if (id == 1) return 100;
-    if (id == 2) return 100;
-    if (id == 3) return 100;
-
+    if (id >= 1 && id <= 3)
+        return 100;
     return -1;
 }
 
-// Votador majoritário local
-long majority(long s1, long s2, long s3)
+long majority(long a, long b, long c)
 {
-    if (s1 == s2 || s1 == s3)
-        return s1;
-
-    if (s2 == s3)
-        return s2;
-
+    if (a == b || a == c)
+        return a;
+    if (b == c)
+        return b;
     return -1;
 }
 
@@ -43,51 +35,37 @@ int main(int argc, char *argv[])
 
     clock_t inicio = clock();
 
-    // Leitura dos três sensores
     long s1 = sensor(1);
     long s2 = sensor(2);
     long s3 = sensor(3);
 
-    // Votador local:
-    // MCU1 executa V1, MCU2 executa V2 e MCU3 executa V3
     long v = majority(s1, s2, s3);
 
     if (v == -1) {
-        printf("ERRO: nao existe maioria entre os sensores.\n");
+        printf("ERRO: sem maioria dos sensores.\n");
         return 1;
     }
 
-    // Três contextos lógicos do IMT
-    long contexto1 = 0;
-    long contexto2 = 0;
-    long contexto3 = 0;
+    long contexto[NUM_CONTEXTS] = {0};
 
-    /*
-     * IMT por interleaving:
-     * executa um passo do contexto 1,
-     * um passo do contexto 2
-     * e um passo do contexto 3.
-     *
-     * A carga total permanece igual a MAX_STEPS.
-     */
-    for (int passo = 0; passo < MAX_STEPS; passo += NUM_CONTEXTS) {
-
-        // Contexto 1
-        contexto1 += v + (passo + 1);
-
-        // Contexto 2
-        if ((passo + 1) < MAX_STEPS)
-            contexto2 += v + (passo + 2);
-
-        // Contexto 3
-        if ((passo + 2) < MAX_STEPS)
-            contexto3 += v + (passo + 3);
+    for (int passo = 0; passo < MAX_STEPS; passo++) {
+        int id = passo % NUM_CONTEXTS;
+        contexto[id] += v + (passo + 1);
     }
 
-    long resultado =
-        contexto1 + contexto2 + contexto3;
+    long resultado = 0;
 
-    volatile long saida_atuador = resultado;
+    for (int i = 0; i < NUM_CONTEXTS; i++)
+        resultado += contexto[i];
+
+    /* Resultados simulados das outras MCUs */
+    long peer1 = resultado;
+    long peer2 = resultado;
+
+    /* Segunda votacao majoritaria simulada */
+    long saida_votada = majority(resultado, peer1, peer2);
+
+    volatile long saida_atuador = saida_votada;
 
     clock_t fim = clock();
 
@@ -97,6 +75,8 @@ int main(int argc, char *argv[])
     printf("MCU=%d\n", mcu_id);
     printf("S1=%ld S2=%ld S3=%ld\n", s1, s2, s3);
     printf("V%d=%ld\n", mcu_id, v);
+    printf("RESULTADO_LOCAL=%ld\n", resultado);
+    printf("VOTACAO_FINAL=%ld\n", saida_votada);
     printf("SAIDA_MCU%d=%ld\n", mcu_id, saida_atuador);
     printf("TEMPO_INTERNO=%f s\n", tempo_interno);
 
