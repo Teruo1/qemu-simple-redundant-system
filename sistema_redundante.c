@@ -48,29 +48,29 @@ int main(int argc, char *argv[])
 
     long contexto[NUM_CONTEXTS] = {0};
 
-    for (int passo = 0; passo < MAX_STEPS; passo++) {
-        int id = passo % NUM_CONTEXTS;
-        contexto[id] += v + (passo + 1);
+    for (int passo = 0; passo < MAX_STEPS; passo += NUM_CONTEXTS) {
+        for (int id = 0; id < NUM_CONTEXTS; id++) {
+            int etapa = passo + id;
+            if (etapa < MAX_STEPS) {
+                contexto[id] += v + (etapa + 1);
+            }
+        }
     }
 
     long resultado = 0;
-
     for (int i = 0; i < NUM_CONTEXTS; i++)
         resultado += contexto[i];
 
-    /* Resultados simulados das outras MCUs */
+    /* Resultados simulados das outras MCUs: nao ha comunicacao entre VMs. */
     long peer1 = resultado;
     long peer2 = resultado;
 
-    /* Segunda votacao majoritaria simulada */
+    /* Segunda votacao majoritaria simulada. */
     long saida_votada = majority(resultado, peer1, peer2);
-
     volatile long saida_atuador = saida_votada;
 
     clock_t fim = clock();
-
-    double tempo_interno =
-        (double)(fim - inicio) / CLOCKS_PER_SEC;
+    double tempo_interno = (double)(fim - inicio) / CLOCKS_PER_SEC;
 
     printf("MCU=%d\n", mcu_id);
     printf("S1=%ld S2=%ld S3=%ld\n", s1, s2, s3);
@@ -79,6 +79,5 @@ int main(int argc, char *argv[])
     printf("VOTACAO_FINAL=%ld\n", saida_votada);
     printf("SAIDA_MCU%d=%ld\n", mcu_id, saida_atuador);
     printf("TEMPO_INTERNO=%f s\n", tempo_interno);
-
     return 0;
 }
