@@ -1,12 +1,13 @@
-/* sistema_simples_medicoes.c
- * Instrumentacao da configuracao SIMPLES, para comparar com o relatorio
- * sistema_redundante_tmr_continuo. Nao altera sistema_simples.c original.
- * Mesmo corpo computacional da referencia: tres sensores, votacao local,
- * processamento convencional (sem IMT), MAX_STEPS=100000 e saida local.
+/* sistema_simples.c
+ * Instrumentacao da configuracao SIMPLES para comparacao
+ * com o programa sistema_redundante.c.
+ * Tres sensores, votacao local, processamento convencional
+ * (sem IMT), MAX_STEPS=100000 e saida local.
  * Sem comunicacao TCP ou votacao inter-MCUs.
- * Compilar: gcc -O0 -std=c11 -Wall -Wextra -Werror sistema_simples_medicoes.c -o sistema_simples_medicoes
- * Executar: time ./sistema_simples_medicoes
+ * Compilar: gcc -O0 -std=c11 -Wall -Wextra -Werror sistema_simples.c -o sistema_simples
+ * Executar: time ./sistema_simples
  */
+
 #define _POSIX_C_SOURCE 200809L
 #include <inttypes.h>
 #include <signal.h>
