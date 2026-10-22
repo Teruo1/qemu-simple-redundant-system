@@ -1,4 +1,4 @@
-/* sistema_redundante_tmr_continuo_otimizado.c
+/* sistema_redundante.c
  * Tres canais QEMU (Q1/Q2/Q3), votacao local dos sensores,
  * IMT em software, resultados TCP reais e maioria final com prioridade.
  *
@@ -7,8 +7,8 @@
  * NAO modifica sistema_simples.c. NAO sincroniza os clocks das VMs.
  *
  * Compilar: gcc -O0 -std=c11 -Wall -Wextra -Werror \
- *              sistema_redundante_tmr_continuo_otimizado.c -o sistema_redundante_tmr_continuo_otimizado
- * Executar: ./sistema_redundante_tmr_continuo_otimizado 1   (ou 2 ou 3)
+ *              sistema_redundante.c -o sistema_redundante
+ * Executar: ./sistema_redundante 1   (ou 2 ou 3)
  */
 #define _POSIX_C_SOURCE 200809L
 #include <arpa/inet.h>
